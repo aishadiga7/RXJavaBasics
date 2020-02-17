@@ -33,6 +33,7 @@ public class CompositeDisposableActivity extends AppCompatActivity {
                         return s.toLowerCase().startsWith("b");
                     }
                 }).subscribeWith(animalObserver));
+
         compositeDisposable.add(animalObservable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(new Predicate<String>() {
@@ -47,7 +48,6 @@ public class CompositeDisposableActivity extends AppCompatActivity {
                     }
                 })
                 .subscribeWith(capsAnimalObserver));
-
 
     }
 
