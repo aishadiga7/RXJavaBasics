@@ -14,6 +14,7 @@ import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
+    private Integer[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     private static final String TAG = "RXJava";
     private Disposable disposable;
 
@@ -22,8 +23,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Observable<String> animalObservable = createObservable();
+        Observable<Integer> numberObservable = createNumberObservable();
         Observer<String> animalObserver  = createObserver();
-        animalObservable
+        numberObservable.
+                subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread()).
+                subscribeWith(new Observer<Integer>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                Log.d(TAG, "onSubscribe:");
+                disposable = d;
+            }
+
+            @Override
+            public void onNext(Integer integer) {
+                Log.d(TAG, "onNext: "+integer);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d(TAG, "onError: ");
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+       /* animalObservable
                 .subscribeOn(Schedulers.io())//observables perform operations on the background thread
                 .observeOn(AndroidSchedulers.mainThread())//hearing on the main thread
                 .filter(new Predicate<String>() {
@@ -32,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                         return s.toLowerCase().startsWith("b");
                     }
                 })
-                .subscribe(animalObserver);
+                .subscribe(animalObserver);*/
     }
 
     private Observer<String> createObserver() {
@@ -63,6 +91,11 @@ public class MainActivity extends AppCompatActivity {
     private Observable<String> createObservable() {
         return Observable.just("Cat", "Dog", "Camel", "Lion", "Tiger", "Bat");
     }
+
+    private Observable<Integer> createNumberObservable() {
+        return Observable.fromArray(numbers);
+    }
+
 
     @Override
     protected void onDestroy() {
